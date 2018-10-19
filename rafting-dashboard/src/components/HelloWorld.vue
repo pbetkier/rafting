@@ -1,44 +1,48 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <h1>Rafting Dashboard</h1>
 
-    <input v-model="peerAddress" title="peer address"/>
-    <button v-on:click="addPeer()">Add peer</button>
+    <div class="add-peer">
+      <input v-model="peer.name" title="peer address" placeholder="Name"/>
+      <input v-model="peer.address" title="peer address" placeholder="Address"/>
+      <button v-on:click="addPeer()" class="confirm-button">Add peer</button>
+    </div>
 
-    <div v-for="peer in peers" :key="peer.address">
-        <p class="peers">{{peer.address}}</p>
-        <button class="peers" v-on:click="deletePeer(peer)">X</button>
+    <div v-for="peer in peers" :key="peer.address" class="peer"
+         v-bind:class="{ leader: peerRole(peer) === 'leader', follower: peerRole(peer) === 'follower', candidate: peerRole(peer) === 'candidate' }">
+        <p class="title">{{peer.name}}</p>
+        <button class="title delete-button" v-on:click="deletePeer(peer)">X</button>
         <table v-if="states[peer.address]">
           <tr>
-            <td>Node ID: </td>
-            <td>{{ states[peer.address].nodeId}}</td>
+            <td class="property">Node ID: </td>
+            <td>{{ states[peer.address].nodeId }}</td>
           </tr>
           <tr>
-            <td>Role: </td>
-            <td>{{ states[peer.address].role}}</td>
+            <td class="property">Role: </td>
+            <td>{{ states[peer.address].role }}</td>
           </tr>
           <tr>
-            <td>Current Term: </td>
+            <td class="property">Current Term: </td>
             <td>{{ states[peer.address].currentTerm }}</td>
           </tr>
           <tr>
-            <td>Last heartbeat: </td>
-            <td>{{ states[peer.address].lastHeartbeat }}</td>
+            <td class="property">Last heartbeat: </td>
+            <td>{{ formatDate(states[peer.address].lastHeartbeat) }}</td>
           </tr>
           <tr>
-            <td>Peers: </td>
-            <td>{{ states[peer.address].peers}}</td>
+            <td class="property">Peers: </td>
+            <td>{{ states[peer.address].peers.join(", ") }}</td>
           </tr>
           <tr>
-            <td>Voted for: </td>
-            <td>{{ states[peer.address].votedFor}}</td>
+            <td class="property">Voted for: </td>
+            <td>{{ states[peer.address].votedFor }}</td>
           </tr>
           <tr>
-            <td>Votes granted: </td>
-            <td>{{ states[peer.address].votesGranted}}</td>
+            <td class="property">Votes granted: </td>
+            <td>{{ states[peer.address].votesGranted }}</td>
           </tr>
         </table>
-        <p v-else>No data yet</p>
+        <div v-else class="no-data">No data yet...</div>
     </div>
   </div>
 </template>
@@ -50,16 +54,15 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      msg: 'Rafting Dashboard',
-      peerAddress: '',
+      peer: {},
       peers: [],
       states: {}
     }
   },
   methods: {
     addPeer: function () {
-      this.peers.push({address: this.peerAddress})
-      this.peerAddress = ''
+      this.peers.push(this.peer)
+      this.peer = {}
     },
     deletePeer: function (peerToDelete) {
       this.peers = this.peers.filter(peer => peer !== peerToDelete)
@@ -76,6 +79,16 @@ export default {
             console.error(e)
           })
       })
+    },
+    formatDate: function (timestamp) {
+      return new Date(timestamp).toLocaleString()
+    },
+    peerRole: function (peer) {
+      let state = this.states[peer.address]
+      if (state) {
+        return state.role
+      }
+      return ''
     }
   },
   created () {
@@ -89,18 +102,87 @@ export default {
 h1, h2 {
   font-weight: normal;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
+.peer {
   display: inline-block;
-  margin: 0 10px;
+  width: 350px;
+
+  text-align: left;
+  background: #C9A6A3;
+  color: #474747;
+  margin: 8px;
+  padding: 16px;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1);
 }
-a {
-  color: #42b983;
-}
-.peers {
+
+.peer > .title {
   display: inline-block;
+}
+.property {
+  font-weight: bold;
+  padding-right: 8px;
+  width: 130px;
+  vertical-align: top;
+}
+
+input {
+  font-size: 16px;
+  padding: 8px;
+  border: black;
+  border-radius: 2px;
+}
+
+.confirm-button {
+  background-color: #087E8B;
+  color: white;
+  border: none;
+  border-radius: 2px;
+  font-size: 16px;
+  padding: 8px;
+  size: 24px;
+}
+
+.add-peer {
+  margin: 16px;
+}
+
+.peer p {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 8px;
+  padding-bottom: 8px;
+}
+
+.delete-button {
+  float: right;
+  margin: 8px;
+  border-radius: 50%;
+  height: 24px;
+  width: 24px;
+  border: 1px solid #474747;
+  padding: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #474747;
+  background: none;
+  box-sizing:content-box;
+}
+
+.no-data {
+  text-align: center;
+  font-size: 16px;
+  padding: 32px;
+}
+
+.leader {
+  background: #53EF8F;
+}
+
+.candidate {
+  background: #68D4FF;
+}
+
+.follower {
+  background: #C9A6A3;
 }
 </style>
