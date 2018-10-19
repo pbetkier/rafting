@@ -52,18 +52,8 @@ export default {
     return {
       msg: 'Rafting Dashboard',
       peerAddress: '',
-      peers: [
-        {
-          id: 123,
-          address: '172.18.200.240:5000'
-        }
-      ],
+      peers: [],
       states: {}
-    }
-  },
-  computed: {
-    statesVO: function () {
-      return Object.entries(this.states)
     }
   },
   methods: {
@@ -78,11 +68,9 @@ export default {
       this.peers.forEach(peer => {
         axios.get(`http://${peer.address}/raft/state`)
           .then(response => {
-            // JSON responses are automatically parsed.
             this.states[peer.address] = response.data
             this.$forceUpdate()
             console.log(response.data)
-            console.log(Object.entries(this.states))
           })
           .catch(e => {
             console.error(e)
@@ -113,9 +101,6 @@ a {
   color: #42b983;
 }
 .peers {
-  display: inline-block;
-}
-.nodes {
   display: inline-block;
 }
 </style>
