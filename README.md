@@ -16,7 +16,10 @@ A node may be written in any technology as long as it conforms to the contract b
 
 * The transport protocol is JSON over HTTP.
 * Node id is formed by it's IP and port, e.g. `192.168.0.12:5000`.
-* TBA: timeouts.
+* Time parameters:
+    * Followers become candidates after 5 seconds without heartbeat.
+    * Leaders send heartbeats every 3 seconds.
+    * Request timeouts are set to 0.5 seconds.
 
 Refer to condensed summary of the Raft algorithm on page 4 of the Raft paper for details on the specific fields and their meaning.
 
@@ -100,5 +103,5 @@ $ curl localhost:5000/raft/state
 
 ## Dashboard
 
-TBA
+Consult `rafting-dashboard` readme.
 
