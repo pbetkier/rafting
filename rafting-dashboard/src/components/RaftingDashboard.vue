@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div>
     <h1>Rafting Dashboard</h1>
 
     <div class="add-peer">
@@ -53,7 +53,7 @@
 import axios from 'axios'
 
 export default {
-  name: 'HelloWorld',
+  name: 'RaftingDashboard',
   data () {
     return {
       peer: {},
@@ -108,6 +108,7 @@ h1, h2 {
   font-weight: normal;
 }
 .peer {
+  vertical-align: top;
   display: inline-block;
   width: 350px;
 
