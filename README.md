@@ -58,7 +58,7 @@ $ cat data.json
 {
   "term": 1
 }
-$ curl -X POST -H Content-Type:application/json -d @data.json localhost:5000/raft/request-vote
+$ curl -X POST -H Content-Type:application/json -d @data.json localhost:5000/raft/append-entries
 {
   "term": 1,
   "success": true
@@ -80,7 +80,7 @@ Fields:
 * `currentTerm` (number): as in Raft paper.
 * `lastHeartbeat` (number): last time a request vote or append entries was received, UTC timestamp in milliseconds.
 * `peers` (array of strings): node ids of all known nodes, excluding self.
-* `self` (string): node id of this node. 
+* `nodeId` (string): node id of this node. 
 * `votedFor` (string): node id of the last candidate this node voted for.
 * `votesGranted` (number): how many votes this node received while being a candidate.
 
@@ -92,7 +92,7 @@ $ curl localhost:5000/raft/state
   "lastHeartbeat": 1539944386183,
   "peers": ["192.168.0.44:5000", "192.168.0.33:8080"],
   "role": "candidate",
-  "self": "192.168.0.12:5000",
+  "nodeId": "192.168.0.12:5000",
   "votedFor": "192.168.0.44:5000",
   "votesGranted": 2
 }
