@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div>
     <h1>Rafting Dashboard</h1>
 
     <div class="add-peer">
@@ -9,10 +9,11 @@
     </div>
 
     <div v-for="peer in peers" :key="peer.address" class="peer"
-         v-bind:class="{ leader: peerRole(peer) === 'leader', follower: peerRole(peer) === 'follower', candidate: peerRole(peer) === 'candidate' }">
+         v-bind:class="{ leader: peerRole(peer) === 'leader', follower: peerRole(peer) === 'follower',
+                         candidate: peerRole(peer) === 'candidate', error: peerRole(peer) === 'error' }">
         <p class="title">{{peer.name}}</p>
         <button class="title delete-button" v-on:click="deletePeer(peer)">X</button>
-        <table v-if="states[peer.address]">
+        <table v-if="states[peer.address] && states[peer.address] !== 'error'">
           <tr>
             <td class="property">Node ID: </td>
             <td>{{ states[peer.address].nodeId }}</td>
@@ -42,7 +43,8 @@
             <td>{{ states[peer.address].votesGranted }}</td>
           </tr>
         </table>
-        <div v-else class="no-data">No data yet...</div>
+        <div v-if="states[peer.address] === 'error'" class="no-data">Error while fetching data 😱</div>
+        <div v-if="states[peer.address] === undefined" class="no-data">No data yet</div>
     </div>
   </div>
 </template>
@@ -51,7 +53,7 @@
 import axios from 'axios'
 
 export default {
-  name: 'HelloWorld',
+  name: 'RaftingDashboard',
   data () {
     return {
       peer: {},
@@ -63,6 +65,7 @@ export default {
     addPeer: function () {
       this.peers.push(this.peer)
       this.peer = {}
+      this.refreshState()
     },
     deletePeer: function (peerToDelete) {
       this.peers = this.peers.filter(peer => peer !== peerToDelete)
@@ -76,6 +79,8 @@ export default {
             console.log(response.data)
           })
           .catch(e => {
+            this.states[peer.address] = 'error'
+            this.$forceUpdate()
             console.error(e)
           })
       })
@@ -85,10 +90,10 @@ export default {
     },
     peerRole: function (peer) {
       let state = this.states[peer.address]
-      if (state) {
+      if (state && state !== 'error') {
         return state.role
       }
-      return ''
+      return 'error'
     }
   },
   created () {
@@ -103,6 +108,7 @@ h1, h2 {
   font-weight: normal;
 }
 .peer {
+  vertical-align: top;
   display: inline-block;
   width: 350px;
 
@@ -184,5 +190,9 @@ input {
 
 .follower {
   background: #C9A6A3;
+}
+
+.error {
+  background: #FF706D;
 }
 </style>
