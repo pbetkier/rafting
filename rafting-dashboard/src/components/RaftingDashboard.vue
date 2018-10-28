@@ -7,6 +7,15 @@
       <input v-model="peer.address" title="peer address" placeholder="Address"/>
       <button v-on:click="addPeer()" class="confirm-button">Add peer</button>
     </div>
+    or add multiple peers
+    <div class="add-peer">
+      <textarea v-model="multiplePeers" title="peer address" placeholder="Name and address separated by space. Multiple nodes are separated by newline"></textarea>
+      <button v-on:click="addMultiplePeers()" class="confirm-button add-multiple">Add peers</button>
+    </div>
+    <div class="validation-error" v-show="validationError">
+      Invalid format. Name and address should be separated by space.
+      Multiple nodes should be separated by new line.
+    </div>
 
     <div v-for="peer in peers" :key="peer.address" class="peer"
          v-bind:class="{ leader: peerRole(peer) === 'leader', follower: peerRole(peer) === 'follower',
@@ -57,8 +66,10 @@ export default {
   data () {
     return {
       peer: {},
+      multiplePeers: '',
       peers: [],
-      states: {}
+      states: {},
+      validationError: false
     }
   },
   methods: {
@@ -66,6 +77,18 @@ export default {
       this.peers.push(this.peer)
       this.peer = {}
       this.refreshState()
+    },
+    addMultiplePeers: function () {
+      this.multiplePeers.split('\n').forEach((line) => {
+        let nameWithAddress = line.split(' ')
+        if (nameWithAddress.length !== 2) {
+          this.validationError = true
+          throw new Error(line + ' has invalid format. The correct format is name separated with address')
+        }
+        this.peers.push({name: nameWithAddress[0], address: nameWithAddress[1]})
+        this.multiplePeers = ''
+        this.validationError = false
+      })
     },
     deletePeer: function (peerToDelete) {
       this.peers = this.peers.filter(peer => peer !== peerToDelete)
@@ -136,6 +159,7 @@ input {
   padding: 8px;
   border: black;
   border-radius: 2px;
+  width: 200px;
 }
 
 .confirm-button {
@@ -146,10 +170,25 @@ input {
   font-size: 16px;
   padding: 8px;
   size: 24px;
+  vertical-align: top;
 }
 
 .add-peer {
   margin: 16px;
+}
+
+.add-peer textarea {
+  font-size: 16px;
+  padding: 8px;
+  border-width: 0;
+  border-radius: 2px;
+  width: 420px;
+  height: 60px;
+  margin-left: 6px;
+}
+
+.validation-error {
+  color: #FF706D
 }
 
 .peer p {
