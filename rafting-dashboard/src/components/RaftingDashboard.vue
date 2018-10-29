@@ -95,7 +95,7 @@ export default {
     },
     refreshState: function () {
       this.peers.forEach(peer => {
-        axios.get(`http://${peer.address}/raft/state`)
+        axios.get(`http://${peer.address}/raft/state`, {timeout: 1000})
           .then(response => {
             this.states[peer.address] = response.data
             this.$forceUpdate()
