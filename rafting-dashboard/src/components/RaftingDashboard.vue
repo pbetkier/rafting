@@ -120,7 +120,7 @@ export default {
     }
   },
   created () {
-    setInterval(() => this.refreshState(), 5000)
+    setInterval(() => this.refreshState(), 1000)
   }
 }
 </script>
